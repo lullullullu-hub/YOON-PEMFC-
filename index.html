@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PEMFC 가습">
+<meta name="theme-color" content="#f7f7f5">
+<title>내가 쓰려고 만든 계산기(made by YOON)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💧%3C/text%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: #f7f7f5;
+    color: #1a1a1a;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 16px 40px;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 8px 0 16px;
+    color: #1a1a1a;
+  }
+  .row { display: grid; grid-template-columns: 1fr 120px; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .row label { font-size: 14px; color: #5a5a55; }
+  .row label small { display: block; font-size: 11px; color: #8a8a85; margin-top: 2px; }
+  .row input, .row select {
+    width: 100%; height: 42px; padding: 0 10px;
+    border: 1px solid #d8d6d0; border-radius: 8px;
+    font-size: 16px; font-variant-numeric: tabular-nums;
+    text-align: right;
+    background: #fff;
+    color: #1a1a1a;
+    -webkit-appearance: none; appearance: none;
+  }
+  .row select { text-align: left; padding-right: 28px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .row input:focus, .row select:focus { outline: none; border-color: #c97c5d; box-shadow: 0 0 0 3px rgba(201,124,93,0.15); }
+  .prow { display: grid; grid-template-columns: 1fr 70px 90px; gap: 6px; align-items: center; margin-bottom: 12px; }
+  .prow label { font-size: 14px; color: #5a5a55; }
+  .prow label small { display: block; font-size: 11px; color: #8a8a85; margin-top: 2px; }
+  .prow input, .prow select {
+    height: 42px; padding: 0 8px;
+    border: 1px solid #d8d6d0; border-radius: 8px;
+    font-size: 15px; font-variant-numeric: tabular-nums;
+    background: #fff; color: #1a1a1a;
+    -webkit-appearance: none; appearance: none;
+  }
+  .prow input { text-align: right; }
+  .prow select { padding-right: 24px; font-size: 13px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  .sec {
+    font-size: 11px; color: #5a5a55;
+    margin: 18px 0 10px;
+    font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .stat {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .stat .lbl { font-size: 11px; color: #6a6a65; margin-bottom: 4px; }
+  .stat .val { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: #1a1a1a; }
+  .stat .unit { font-size: 11px; color: #8a8a85; font-weight: 400; margin-left: 3px; }
+  .hero {
+    background: linear-gradient(135deg, #c97c5d 0%, #b56849 100%);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin: 8px 0 4px;
+    color: #fff;
+  }
+  .hero .lbl { font-size: 12px; opacity: 0.85; margin-bottom: 4px; }
+  .hero .val { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .footnote {
+    font-size: 11px; color: #8a8a85;
+    margin-top: 16px; line-height: 1.6;
+    padding: 12px;
+    background: #efedea;
+    border-radius: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    html, body { background: #1a1a1a; color: #ececea; }
+    h1 { color: #ececea; }
+    .row label, .prow label { color: #b0b0aa; }
+    .row label small, .prow label small { color: #8a8a85; }
+    .row input, .row select, .prow input, .prow select {
+      background: #2a2a2a; color: #ececea; border-color: #3a3a3a;
+    }
+    .stat { background: #2a2a2a; border-color: #3a3a3a; }
+    .stat .val { color: #ececea; }
+    .stat .lbl { color: #a0a09a; }
+    .footnote { background: #2a2a2a; color: #a0a09a; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>💧 PEMFC 가습 계산기</h1>
+
+  <div class="sec">셀 / 가스 조건</div>
+  <div class="row">
+    <label>가스 종류</label>
+    <select id="gas">
+      <option value="air">공기 (Cathode)</option>
+      <option value="h2">수소 (Anode)</option>
+      <option value="o2">순산소 (Cathode)</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>셀 운전 온도<small>T_cell, ℃</small></label>
+    <input type="number" inputmode="decimal" id="tcell" value="65" step="0.5"/>
+  </div>
+  <div class="row">
+    <label>목표 상대습도<small>RH at T_cell, %</small></label>
+    <input type="number" inputmode="decimal" id="rh" value="100" step="1" min="1" max="150"/>
+  </div>
+  <div class="prow">
+    <label>스택 입구 압력<small>P_in</small></label>
+    <input type="number" inputmode="decimal" id="pin" value="0" step="1"/>
+    <select id="ptype">
+      <option value="gauge">kPa(G)</option>
+      <option value="abs">kPa(A)</option>
+      <option value="barg">bar(G)</option>
+      <option value="bara">bar(A)</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>대기압<small>P_atm, kPa</small></label>
+    <input type="number" inputmode="decimal" id="patm" value="101.325" step="0.1"/>
+  </div>
+
+  <div class="sec">전기화학 조건</div>
+  <div class="row">
+    <label>전류밀도<small>A/cm²</small></label>
+    <input type="number" inputmode="decimal" id="cd" value="1.0" step="0.05" min="0"/>
+  </div>
+  <div class="row">
+    <label>활성면적<small>cm² (셀 1장)</small></label>
+    <input type="number" inputmode="decimal" id="area" value="25" step="1" min="0"/>
+  </div>
+  <div class="row">
+    <label>셀 수<small>N_cell</small></label>
+    <input type="number" inputmode="numeric" id="ncell" value="1" step="1" min="1"/>
+  </div>
+  <div class="row">
+    <label>Stoich ratio<small>SR (λ)</small></label>
+    <input type="number" inputmode="decimal" id="sr" value="2.0" step="0.1" min="1"/>
+  </div>
+
+  <div class="sec">가습 출력</div>
+  <div class="hero">
+    <div class="lbl">필요 가습기 출구 이슬점 T_dp</div>
+    <div class="val" id="tdp-out">65.0 ℃</div>
+  </div>
+
+  <div class="grid2" style="margin-top: 10px;">
+    <div class="stat"><div class="lbl">P_in 절대압</div><div class="val" id="pabs">101.33<span class="unit">kPa(A)</span></div></div>
+    <div class="stat"><div class="lbl">P_sat(T_cell)</div><div class="val" id="psat">25.04<span class="unit">kPa</span></div></div>
+    <div class="stat"><div class="lbl">P_H2O 필요</div><div class="val" id="pw">25.04<span class="unit">kPa</span></div></div>
+    <div class="stat"><div class="lbl">수증기 몰분율</div><div class="val" id="yh2o">0.247</div></div>
+  </div>
+
+  <div class="sec">스택 전기 / 유량</div>
+  <div class="grid2">
+    <div class="stat"><div class="lbl">셀당 전류</div><div class="val" id="i-cell">25.0<span class="unit">A</span></div></div>
+    <div class="stat"><div class="lbl">스택 총전류</div><div class="val" id="i-tot">25.0<span class="unit">A</span></div></div>
+    <div class="stat"><div class="lbl">건조가스 (스택)</div><div class="val" id="q-dry">5.22<span class="unit">SLPM</span></div></div>
+    <div class="stat"><div class="lbl">습가스 (스택)</div><div class="val" id="q-wet">6.95<span class="unit">SLPM</span></div></div>
+  </div>
+
+  <div class="sec">물 수지 (스택 기준)</div>
+  <div class="grid2">
+    <div class="stat"><div class="lbl">생성수 (cathode)</div><div class="val" id="w-gen">8.39<span class="unit">mg/s</span></div></div>
+    <div class="stat"><div class="lbl">가습 공급수</div><div class="val" id="w-hum">42.0<span class="unit">mg/s</span></div></div>
+    <div class="stat"><div class="lbl">가습수 (부피)</div><div class="val" id="w-hum-ml">2.52<span class="unit">mL/min</span></div></div>
+    <div class="stat"><div class="lbl">총 물 유출</div><div class="val" id="w-tot">50.4<span class="unit">mg/s</span></div></div>
+  </div>
+
+  <div class="footnote">
+    Magnus 식 (a=17.625, b=243.04). P_in은 스택 입구 기준 — 게이지압이면 P_atm 더해서 절대압 환산 후 사용. SLPM = 0℃, 101.325 kPa. 가스 매니폴드 병렬 분배 가정.
+  </div>
+</div>
+
+<script>
+(function(){
+  const a = 17.625, b = 243.04;
+  const F = 96485;
+  const MW_H2O = 18.015;
+
+  const $ = id => document.getElementById(id);
+  const els = {
+    gas: $('gas'), tcell: $('tcell'), rh: $('rh'),
+    pin: $('pin'), ptype: $('ptype'), patm: $('patm'),
+    cd: $('cd'), area: $('area'), ncell: $('ncell'), sr: $('sr'),
+    tdp: $('tdp-out'), pabs: $('pabs'), psat: $('psat'), pw: $('pw'), yh2o: $('yh2o'),
+    iCell: $('i-cell'), iTot: $('i-tot'), qDry: $('q-dry'), qWet: $('q-wet'),
+    wGen: $('w-gen'), wHum: $('w-hum'), wHumMl: $('w-hum-ml'), wTot: $('w-tot'),
+  };
+
+  function psat_kPa(T){ return 6.112 * Math.exp((a*T)/(b+T)) / 10; }
+  function tdpFromP(p_kPa){
+    const p_hPa = p_kPa * 10;
+    const alpha = Math.log(p_hPa / 6.112);
+    return (b * alpha) / (a - alpha);
+  }
+  function toAbsKPa(val, type, patm){
+    switch(type){
+      case 'gauge': return val + patm;
+      case 'abs':   return val;
+      case 'barg':  return val*100 + patm;
+      case 'bara':  return val*100;
+    }
+    return val;
+  }
+
+  // localStorage로 입력값 저장/복원
+  const STORAGE_KEY = 'pemfc_calc_v1';
+  function saveInputs(){
+    const data = {};
+    ['gas','tcell','rh','pin','ptype','patm','cd','area','ncell','sr'].forEach(k => {
+      data[k] = els[k].value;
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){}
+  }
+  function loadInputs(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      Object.keys(data).forEach(k => {
+        if (els[k] && data[k] !== undefined) els[k].value = data[k];
+      });
+    } catch(e){}
+  }
+
+  function update(){
+    const gas = els.gas.value;
+    const T = parseFloat(els.tcell.value);
+    const RH = parseFloat(els.rh.value);
+    const pinVal = parseFloat(els.pin.value);
+    const ptype = els.ptype.value;
+    const Patm = parseFloat(els.patm.value);
+    const cd = parseFloat(els.cd.value);
+    const area = parseFloat(els.area.value);
+    const N = parseInt(els.ncell.value);
+    const SR = parseFloat(els.sr.value);
+
+    if ([T,RH,pinVal,Patm,cd,area,N,SR].some(v => isNaN(v))) return;
+
+    const Ptot = toAbsKPa(pinVal, ptype, Patm);
+    const Ps = psat_kPa(T);
+    const Pw = Ps * RH / 100;
+    const Tdp = (Pw <= 0) ? -999 : tdpFromP(Pw);
+
+    let n_e, x_react;
+    if (gas === 'h2') { n_e = 2; x_react = 1.0; }
+    else if (gas === 'o2') { n_e = 4; x_react = 1.0; }
+    else { n_e = 4; x_react = 0.21; }
+
+    const I_cell = cd * area;
+    const n_consume_cell = I_cell / (n_e * F);
+    const n_dry_cell = (SR * n_consume_cell) / x_react;
+    const n_dry_stack = N * n_dry_cell;
+    const Q_dry_SLPM = n_dry_stack * 22.414 * 60;
+
+    const y_H2O = (Ptot > 0) ? Pw / Ptot : NaN;
+    const n_wet_stack = (y_H2O < 1) ? n_dry_stack / (1 - y_H2O) : NaN;
+    const Q_wet_SLPM = isNaN(n_wet_stack) ? NaN : n_wet_stack * 22.414 * 60;
+    const n_H2O_hum = isNaN(n_wet_stack) ? NaN : n_dry_stack * y_H2O / (1 - y_H2O);
+    const m_H2O_hum = n_H2O_hum * MW_H2O * 1000;
+    const m_H2O_gen = N * I_cell / (2 * F) * MW_H2O * 1000;
+    const m_H2O_out = (gas === 'h2') ? m_H2O_hum : m_H2O_hum + m_H2O_gen;
+    const ml_min_hum = m_H2O_hum * 60 / 1000;
+
+    els.tdp.textContent = (Tdp < -100 ? '—' : Tdp.toFixed(1) + ' ℃');
+    els.pabs.innerHTML = Ptot.toFixed(2) + '<span class="unit"> kPa(A)</span>';
+    els.psat.innerHTML = Ps.toFixed(2) + '<span class="unit"> kPa</span>';
+    els.pw.innerHTML = Pw.toFixed(2) + '<span class="unit"> kPa</span>';
+    els.yh2o.textContent = isNaN(y_H2O) ? '—' : (y_H2O > 1 ? '> 1 (불가)' : y_H2O.toFixed(3));
+    els.iCell.innerHTML = I_cell.toFixed(1) + '<span class="unit"> A</span>';
+    els.iTot.innerHTML = I_cell.toFixed(1) + '<span class="unit"> A</span>';
+    els.qDry.innerHTML = Q_dry_SLPM.toFixed(2) + '<span class="unit"> SLPM</span>';
+    els.qWet.innerHTML = (isNaN(Q_wet_SLPM) ? '—' : Q_wet_SLPM.toFixed(2)) + '<span class="unit"> SLPM</span>';
+    els.wGen.innerHTML = m_H2O_gen.toFixed(2) + '<span class="unit"> mg/s</span>';
+    els.wHum.innerHTML = (isNaN(m_H2O_hum) ? '—' : m_H2O_hum.toFixed(2)) + '<span class="unit"> mg/s</span>';
+    els.wHumMl.innerHTML = (isNaN(ml_min_hum) ? '—' : ml_min_hum.toFixed(2)) + '<span class="unit"> mL/min</span>';
+    els.wTot.innerHTML = (isNaN(m_H2O_out) ? '—' : m_H2O_out.toFixed(2) + '<span class="unit"> mg/s</span>');
+
+    saveInputs();
+  }
+
+  loadInputs();
+  Object.values(els).forEach(el => {
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) {
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+    }
+  });
+  update();
+})();
+</script>
+</body>
+</html>
